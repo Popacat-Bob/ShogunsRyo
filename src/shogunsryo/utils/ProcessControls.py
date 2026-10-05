@@ -5,6 +5,9 @@ from pynput.mouse import Controller as MController, Button
 
 from shogunsryo.ptypes.Generic import Coords
 
+def _ease_in_out(t):
+    return t * t * (3 - 2 * t)   
+
 class PC:
     '''
     A Process Controller meant for handling controls of a specific process
@@ -21,8 +24,7 @@ class PC:
         tx, ty = target.x, target.y
         return (tx - x, ty - y)
 
-    def _ease_in_out(self, t):
-        return t * t * (3 - 2 * t)          # smoothstep
+       # smoothstep
     
     def focus(self):
         ''' 
