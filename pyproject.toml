@@ -1,0 +1,26 @@
+[project]
+name = "shogunsryo"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Popacat-Bob", email = "gdloyola9@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "mouseinfo>=0.1.3",
+    "mss>=10.2.0",
+    "ollama>=0.6.3",
+    "opencv-python>=5.0.0.93",
+    "pillow>=12.3.0",
+    "pyautogui>=0.9.54",
+    "pynput>=1.8.2",
+    "pytesseract>=0.3.13",
+]
+
+[project.scripts]
+shogunsryo = "shogunsryo:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"

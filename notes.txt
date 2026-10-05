@@ -1,0 +1,27 @@
+[SD = Screen Details]
+SD Resolution: 1920x1080
+SD Aspect Ratio: 16:9
+
+[NF = Narrative Frame]
+NF TopLeft: 380, 312
+NF BottomRight: 911, 462
+
+[MDF = Misc Details Frame]
+MDF TopLeft: 975, 361
+MDF BottomRight: 1537, 707
+
+[QF = Questions Frame]
+QF TopLeft: 389, 721
+QF BottomRight: 747, 822
+
+[RNF = Relative NF]
+RNF TopLeft: 19/96, 13/45
+RNF BottomRight: 911/1920, 77/180 
+
+[RMDF = Relative RDF]
+RMDF TopLeft: 65/128, 361/1000
+RMDF BottomRight: 497/640, 659/1000
+
+[RQF = Relative QF]
+RQF TopLeft: 389/1920, 721/1080
+RQF BottomRight: 249/640, 137/180

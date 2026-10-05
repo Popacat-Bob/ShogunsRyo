@@ -1,0 +1,14 @@
+[Screen]
+resolution = [1920, 1080]
+aspect_ratio = [16, 9]
+
+[Frames]
+narrative = [380, 312, 918, 656]
+misc_details = [975, 361, 1537, 707]
+questions = [389, 721, 747, 822]
+
+[Points]
+verify_point = [374, 212]
+start_button = [1408, 857]
+
+
