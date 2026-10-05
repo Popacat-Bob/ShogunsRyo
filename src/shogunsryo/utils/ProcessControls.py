@@ -61,6 +61,9 @@ class PC:
     def press(self, key: KeyCode):
         self.keyb.press(key)
 
+    def ktap(self, key: KeyCode):
+        self.keyb.tap(key)
+
     def scroll(self, clicks: int, c: Coords | None = None, delay=0.03):
         '''
         Positive = up, negative = down. Optionally move to pos first.

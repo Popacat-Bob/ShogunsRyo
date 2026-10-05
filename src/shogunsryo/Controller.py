@@ -1,4 +1,5 @@
-from ollama import Client
+from google import genai
+from google.genai import types
 from pynput.keyboard import KeyCode
 from enum import Enum
 from pathlib import Path
@@ -47,11 +48,12 @@ REFER_INTENTS = {
     "wants to change the tax rate",
     "wants a prisoner set free",
     "wants a domain boundary restored",
-    "wants leave to carry a sword"
+    "wants leave to carry a sword",
+    "wants a priest appointed to the temple"
 }
 
 DEFAULTS = Path(__file__).parent / "config" / "defaults.toml"
-
+DEFAULT_MODEL = "gemini-3.6-flash"
 
 class Verdict(Enum):
     ACCEPT = 0
@@ -60,10 +62,10 @@ class Verdict(Enum):
 
 
 class Controller:
-    def __init__(self, dc: DocCore, pc: PC, ollama: Client, path=DEFAULTS):
+    def __init__(self, dc: DocCore, pc: PC, client: genai.Client, path=DEFAULTS):
         self.dc = dc
         self.pc = pc
-        self.olla = ollama
+        self.client = client
         self.enabled = False
 
         self.log_dir = Path(__file__).parent / "log"
@@ -82,6 +84,12 @@ class Controller:
                 Coords(*data["Frames"]["result"][i:i + 2])
                 for i in range(0, 4, 2)
             ]
+        )
+
+        self.config = types.GenerateContentConfig(
+            system_instruction=DEFAULT_INITIAL_PROMPT,
+            response_mime_type="application/json",
+            response_schema=SCHEMA,
         )
 
     def log_error(self, docFrame, claims, verdict, error):
@@ -177,15 +185,14 @@ class Controller:
             return
 
         self.pc.focus()
-
         while not self.dc.isReadingDocs():
             if not self.enabled:
                 return
-
+            
             print("INFO: Attempted to commence.")
-
-            self.pc.press(KeyCode.from_char("e"))
-            time.sleep(1)
+            time.sleep(2)
+            self.pc.ktap(KeyCode.from_char("e"))
+            time.sleep(0.2)
 
             self.pc.move_to(Coords(1408, 857))
             time.sleep(0.2)
@@ -199,30 +206,15 @@ class Controller:
             # getDocJson() appears to return JSON text.
             docData = json.loads(docFrame)
 
-            res = self.olla.chat(
-                model="qwen3:4b",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": DEFAULT_INITIAL_PROMPT
-                    },
-                    {
-                        "role": "user",
-                        "content": docFrame
-                    }
-                ],
-                think=False,
-                format=SCHEMA,
-                keep_alive="30m",
-                options={
-                    "temperature": 0,
-                    "num_predict": 30
-                },
+
+            res = self.client.models.generate_content(
+                model=DEFAULT_MODEL,
+                contents=(json.dumps(docData)),
+                config=self.config
             )
 
-            print(f"REPLY: {res.message.content}")
 
-            claims = json.loads(res.message.content)
+            claims = json.loads(res.text)
 
             claim_values = [
                 claims["claim1"],
@@ -258,13 +250,11 @@ class Controller:
                 )
 
         except Exception as e:
-            self.log_error(
-                docFrame,
-                None,
-                Verdict.REJECT,
-                e
-            )
-
-            print(f"ERROR: {e}")
+            print(f"ERROR: {e}\nDISABLING")
+            self.pc.move_to(Coords(1408, 857))
+            time.sleep(0.2)
+            self.pc.click()
+            time.sleep(0.2)
+            self.enabled = False
 
         time.sleep(6)

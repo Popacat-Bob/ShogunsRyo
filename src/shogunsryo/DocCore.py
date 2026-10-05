@@ -9,14 +9,14 @@ import pyautogui
 from shogunsryo.ptypes.Generic import Coords, Dimensions, Bbox
 from shogunsryo.utils.ScreenCapture import ScreenCapture
 from shogunsryo.utils.ProcessControls import PC
-from shogunsryo.utils.TextExtractor import extractFromImg
+from shogunsryo.utils.TextExtractor import TextExtractor
 
 DEFAULTS = Path(__file__).parent / "config" / "defaults.toml"
 TEST_DIR = Path(__file__).parent / "test/"
 TEST_DIR_S = f"{TEST_DIR}"
 
 class DocCore:
-    def __init__(self, path=DEFAULTS):
+    def __init__(self, te: TextExtractor, path=DEFAULTS):
         with open(path, "rb") as f:
             data = tomllib.load(f)
 
@@ -28,6 +28,7 @@ class DocCore:
 
         self.SC = ScreenCapture(self.sd)
         self.PC = PC()
+        self.TE = te
     
     
     def extractField(self, img: np.ndarray, coords = None, numeric: bool = False) -> str | int:
@@ -36,15 +37,14 @@ class DocCore:
             crop = img[coords[0]:coords[1], coords[2]:coords[3]]
 
         if numeric:
-            try: return int(extractFromImg(
-                crop,
-                psm=7,
-                whitelist="0123456789",
-            ).strip())
+            try: return int(self.TE.extractFromImg(
+                    crop,
+                    whitelist="0123456789"
+                    ).strip())
             except ValueError:
                 return 0 #TODO: Make this better (if it's an issue)
 
-        return extractFromImg(crop).strip()
+        return self.TE.extractFromImg(crop).strip()
 
 
     def _extractFText(

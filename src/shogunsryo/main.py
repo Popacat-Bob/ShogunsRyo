@@ -1,22 +1,23 @@
 import time
-from ollama import Client
+import easyocr
+from google import genai
 from pynput.keyboard import KeyCode, Listener as KListener
 
 from shogunsryo.Controller import Controller
 from shogunsryo.DocCore import DocCore
 from shogunsryo.utils.ProcessControls import PC
 from shogunsryo.utils.ScreenCapture import ScreenCapture
+from shogunsryo.utils.TextExtractor import TextExtractor
 
 
 def main():
-    olla = Client(
-        host="http://localhost:11434"
-    )
-
+    te = TextExtractor(
+            easyocr.Reader(["en"], gpu=False) 
+            )
     control = Controller(
-        dc=DocCore(),
+        dc=DocCore(te=te),
         pc=PC(),
-        ollama=olla
+        client=genai.Client()
     )
 
     def on_p(key):
