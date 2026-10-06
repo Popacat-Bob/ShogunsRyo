@@ -1,5 +1,6 @@
 from google import genai
 from google.genai import types
+
 from pynput.keyboard import KeyCode
 from enum import Enum
 from pathlib import Path
@@ -7,17 +8,29 @@ from datetime import datetime
 import time
 import tomllib
 import json
+import os
 
 from shogunsryo.DocCore import DocCore
 from shogunsryo.utils.ProcessControls import PC
 from shogunsryo.ptypes.Generic import Coords, Bbox
+
 
 DEFAULT_INITIAL_PROMPT = """
 After this message you will only receive JSON data.
 
 In this JSON data, there is a "Claims" section. Verify whether each claim is true based on the rest of the JSON data.
 
-Some letters, characters, or words may look slightly incorrect because the data was extracted using OCR. Use context clues and common sense when interpreting possible OCR errors.
+IMPORTANT:
+- Treat the JSON data as the source of truth.
+- Claims may contain OCR errors. Correct obvious OCR errors using the surrounding JSON data.
+- Do not interpret OCR mistakes literally when the intended value is obvious.
+- Use context clues and common sense when interpreting possible OCR errors.
+- Perform arithmetic explicitly when necessary.
+- For comparisons such as "X more than Y", calculate the difference from the relevant numeric fields.
+- A value of 0 means none/zero. For example, "Times Written": 0 means the person has NOT written this season.
+- For color/seal claims, compare the RGB arrays exactly.
+- Do not assume a claim is true merely because it sounds plausible.
+- Check every claim independently.
 
 Once you have determined the answers, send ONLY a JSON object with the keys claim1, claim2, and claim3:
 
@@ -30,6 +43,7 @@ Do NOT determine a verdict. The program will determine the verdict separately.
 Do not include any explanation, markdown, code fences, or additional text.
 """
 
+
 SCHEMA = {
     "type": "object",
     "properties": {
@@ -37,8 +51,13 @@ SCHEMA = {
         "claim2": {"type": "boolean"},
         "claim3": {"type": "boolean"},
     },
-    "required": ["claim1", "claim2", "claim3"],
+    "required": [
+        "claim1",
+        "claim2",
+        "claim3",
+    ],
 }
+
 
 REFER_INTENTS = {
     "wants a samurai punished",
@@ -49,11 +68,14 @@ REFER_INTENTS = {
     "wants a prisoner set free",
     "wants a domain boundary restored",
     "wants leave to carry a sword",
-    "wants a priest appointed to the temple"
+    "wants a priest appointed to the temple",
 }
 
+
 DEFAULTS = Path(__file__).parent / "config" / "defaults.toml"
-DEFAULT_MODEL = "gemini-3.6-flash"
+
+DEFAULT_MODEL = "gemini-3.5-flash-lite"
+
 
 class Verdict(Enum):
     ACCEPT = 0
@@ -62,17 +84,26 @@ class Verdict(Enum):
 
 
 class Controller:
-    def __init__(self, dc: DocCore, pc: PC, client: genai.Client, path=DEFAULTS):
+    def __init__(
+        self,
+        dc: DocCore,
+        pc: PC,
+        client: genai.Client,
+        path=DEFAULTS
+    ):
         self.dc = dc
         self.pc = pc
         self.client = client
         self.enabled = False
 
         self.log_dir = Path(__file__).parent / "log"
-        self.log_dir.mkdir(parents=True, exist_ok=True)
-
+        self.log_dir.mkdir(
+            parents=True,
+            exist_ok=True
+        )
 
         log_file = self.log_dir / "errors.jsonl"
+
         if log_file.exists():
             log_file.unlink()
 
@@ -90,9 +121,16 @@ class Controller:
             system_instruction=DEFAULT_INITIAL_PROMPT,
             response_mime_type="application/json",
             response_schema=SCHEMA,
+            temperature=0,
         )
 
-    def log_error(self, docFrame, claims, verdict, error):
+    def log_error(
+        self,
+        docFrame,
+        claims,
+        verdict,
+        error
+    ):
         log_file = self.log_dir / "errors.jsonl"
 
         entry = {
@@ -103,14 +141,31 @@ class Controller:
             "docFrame": docFrame,
         }
 
-        with open(log_file, "a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        with open(
+            log_file,
+            "a",
+            encoding="utf-8"
+        ) as f:
+            f.write(
+                json.dumps(
+                    entry,
+                    ensure_ascii=False
+                ) + "\n"
+            )
 
-    def determine_verdict(self, docFrame, claims) -> Verdict:
+    def determine_verdict(
+        self,
+        docFrame,
+        claims
+    ) -> Verdict:
         if not all(claims):
             return Verdict.REJECT
 
-        intent = docFrame["Letter"]["Intent"].strip().lower()
+        intent = (
+            docFrame["Letter"]["Intent"]
+            .strip()
+            .lower()
+        )
 
         # Handle common OCR truncation.
         if intent == "wants a domain boundary resto":
@@ -123,10 +178,13 @@ class Controller:
 
     def isSuccess(self) -> bool:
         res_img = self.dc.SC.screenshot(self.resf)
+
         res_str = self.dc.extractField(
             self.dc.SC.toArray(res_img)
         ).strip().upper()
+
         print(res_str)
+
         return "EARNED" in set(res_str.split())
 
     def answer(
@@ -139,18 +197,26 @@ class Controller:
         print("INFO: Commenced Answering")
 
         if b0:
-            self.pc.move_to(Coords(1470, 734))
+            self.pc.move_to(
+                Coords(1470, 734)
+            )
         else:
-            self.pc.move_to(Coords(1375, 735))
+            self.pc.move_to(
+                Coords(1375, 735)
+            )
 
         self.pc.click()
 
         time.sleep(0.2)
 
         if b1:
-            self.pc.move_to(Coords(1469, 768))
+            self.pc.move_to(
+                Coords(1469, 768)
+            )
         else:
-            self.pc.move_to(Coords(1348, 768))
+            self.pc.move_to(
+                Coords(1348, 768)
+            )
 
         time.sleep(0.2)
         self.pc.click()
@@ -158,9 +224,13 @@ class Controller:
         time.sleep(0.2)
 
         if b2:
-            self.pc.move_to(Coords(1470, 802))
+            self.pc.move_to(
+                Coords(1470, 802)
+            )
         else:
-            self.pc.move_to(Coords(1372, 802))
+            self.pc.move_to(
+                Coords(1372, 802)
+            )
 
         time.sleep(0.2)
         self.pc.click()
@@ -169,11 +239,19 @@ class Controller:
 
         match v:
             case Verdict.ACCEPT:
-                self.pc.move_to(Coords(681, 850))
+                self.pc.move_to(
+                    Coords(681, 850)
+                )
+
             case Verdict.REJECT:
-                self.pc.move_to(Coords(982, 848))
+                self.pc.move_to(
+                    Coords(982, 848)
+                )
+
             case Verdict.REFER:
-                self.pc.move_to(Coords(1243, 853))
+                self.pc.move_to(
+                    Coords(1243, 853)
+                )
 
         self.pc.click()
 
@@ -185,16 +263,25 @@ class Controller:
             return
 
         self.pc.focus()
+
         while not self.dc.isReadingDocs():
             if not self.enabled:
                 return
-            
+
             print("INFO: Attempted to commence.")
+
             time.sleep(2)
-            self.pc.ktap(KeyCode.from_char("e"))
+
+            self.pc.ktap(
+                KeyCode.from_char("e")
+            )
+
             time.sleep(0.2)
 
-            self.pc.move_to(Coords(1408, 857))
+            self.pc.move_to(
+                Coords(1408, 857)
+            )
+
             time.sleep(0.2)
             self.pc.click()
 
@@ -203,16 +290,13 @@ class Controller:
         docFrame = self.dc.getDocJson()
 
         try:
-            # getDocJson() appears to return JSON text.
             docData = json.loads(docFrame)
-
 
             res = self.client.models.generate_content(
                 model=DEFAULT_MODEL,
-                contents=(json.dumps(docData)),
-                config=self.config
+                contents=json.dumps(docData),
+                config=self.config,
             )
-
 
             claims = json.loads(res.text)
 
@@ -250,11 +334,16 @@ class Controller:
                 )
 
         except Exception as e:
-            print(f"ERROR: {e}\nDISABLING")
-            self.pc.move_to(Coords(1408, 857))
+            print(
+                f"ERROR: {e}\n"
+                "DISABLING"
+            )
+
+            self.pc.move_to(
+                Coords(1408, 857)
+            )
+
             time.sleep(0.2)
             self.pc.click()
-            time.sleep(0.2)
-            self.enabled = False
 
         time.sleep(6)

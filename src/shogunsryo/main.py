@@ -12,7 +12,7 @@ from shogunsryo.utils.TextExtractor import TextExtractor
 
 def main():
     te = TextExtractor(
-            easyocr.Reader(["en"], gpu=False) 
+            easyocr.Reader(["en"], gpu=False) # should be true but having storage issues rn
             )
     control = Controller(
         dc=DocCore(te=te),
