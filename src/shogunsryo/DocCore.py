@@ -15,6 +15,8 @@ DEFAULTS = Path(__file__).parent / "config" / "defaults.toml"
 TEST_DIR = Path(__file__).parent / "test/"
 TEST_DIR_S = f"{TEST_DIR}"
 
+INTEGER_WHITELIST="0123456789"
+
 class DocCore:
     def __init__(self, te: TextExtractor, path=DEFAULTS):
         with open(path, "rb") as f:
@@ -31,34 +33,44 @@ class DocCore:
         self.TE = te
     
     
-    def extractField(self, img: np.ndarray, coords = None, numeric: bool = False) -> str | int:
+    def extractField(
+            self, 
+            img: np.ndarray, 
+            coords = None, 
+            wl: str | None = None,
+            ):
         crop = img
         if coords: 
             crop = img[coords[0]:coords[1], coords[2]:coords[3]]
 
-        if numeric:
-            try: return int(self.TE.extractFromImg(
+        if wl:
+            return self.TE.extractFromImg(
                     crop,
-                    whitelist="0123456789"
-                    ).strip())
-            except ValueError:
-                return 0 #TODO: Make this better (if it's an issue)
+                    ).strip()
 
         return self.TE.extractFromImg(crop).strip()
 
 
     def _extractFText(
-        self,
-        md0: np.ndarray,
-        md1: np.ndarray,
-        nar: np.ndarray,
-        q: np.ndarray,
-    ):
+            self,
+            md0: np.ndarray,
+            md1: np.ndarray,
+            nar: np.ndarray,
+            q: np.ndarray,
+        ):
         return {
             "Meta": {
-                "Signed On": self.extractField(md0, (37, 56, 532, 584), True),
-                "Times Written": self.extractField(md0, (68, 84, 493, 543), True),
-                "Today": self.extractField(md0, (94, 114, 532, 541), True),
+                "Signed On": self.extractField(
+                    md0, (37, 56, 526, 584),
+                    wl=INTEGER_WHITELIST
+                ),
+                "Times Written": self.extractField(
+                    md0, (65, 85, 415, 545),
+                ),
+                "Today": self.extractField(
+                    md0, (94, 114, 532, 541),
+                    wl=INTEGER_WHITELIST
+                ),
             },
             "Letter": {
                 "From": self.extractField(nar, (11, 38, 12, 235)),
@@ -67,39 +79,75 @@ class DocCore:
                 "Body": self.extractField(nar, (85, 144, 12, 525)),
             },
             "Shisato": {
-                "Ryo": self.extractField(md0, (153, 174, 485, 513), True),
+                "Ryo": self.extractField(
+                    md0, (153, 174, 485, 513),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Head": self.extractField(md0, (180, 197, 84, 142)),
-                "Houses": self.extractField(md0, (177, 197, 475, 492), True),
+                "Houses": self.extractField(
+                    md0, (177, 197, 475, 492),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Color": md0[161, 475][::-1][:3].tolist(),
             },
             "Kotobo": {
-                "Ryo": self.extractField(md0, (207, 226, 485, 513), True),
+                "Ryo": self.extractField(
+                    md0, (207, 226, 485, 513),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Head": self.extractField(md0, (231, 250, 84, 142)),
-                "Houses": self.extractField(md0, (234, 252, 475, 492), True),
+                "Houses": self.extractField(
+                    md0, (234, 252, 475, 492),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Color": md0[215, 475][::-1][:3].tolist(),
             },
             "Farmers": {
-                "Ryo": self.extractField(md0, (260, 280, 485, 513), True),
+                "Ryo": self.extractField(
+                    md0, (260, 280, 485, 513),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Head": self.extractField(md0, (291, 309, 84, 142)),
-                "Houses": self.extractField(md0, (286, 305, 475, 492), True),
+                "Houses": self.extractField(
+                    md0, (286, 305, 475, 492),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Color": md0[268, 475][::-1][:3].tolist(),
             },
             "Market": {
-                "Ryo": self.extractField(md1, (154, 175, 485, 513), True),
+                "Ryo": self.extractField(
+                    md1, (154, 175, 485, 513),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Head": self.extractField(md1, (181, 203, 84, 142)),
-                "Houses": self.extractField(md1, (182, 199, 475, 492), True),
+                "Houses": self.extractField(
+                    md1, (182, 199, 475, 492),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Color": md1[163, 475][::-1][:3].tolist(),
             },
             "Western Village": {
-                "Ryo": self.extractField(md1, (208, 228, 485, 513), True),
+                "Ryo": self.extractField(
+                    md1, (208, 228, 485, 513),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Head": self.extractField(md1, (232, 252, 84, 142)),
-                "Houses": self.extractField(md1, (236, 256, 475, 492), True),
+                "Houses": self.extractField(
+                    md1, (236, 256, 475, 492),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Color": md1[216, 475][::-1][:3].tolist(),
             },
             "River Hamlet": {
-                "Ryo": self.extractField(md1, (261, 281, 475, 513), True),
+                "Ryo": self.extractField(
+                    md1, (261, 281, 475, 513),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Head": self.extractField(md1, (288, 308, 84, 142)),
-                "Houses": self.extractField(md1, (288, 308, 475, 492), True),
+                "Houses": self.extractField(
+                    md1, (288, 308, 475, 492),
+                    wl=INTEGER_WHITELIST
+                ),
                 "Color": md1[271, 475][::-1][:3].tolist(),
             },
             "Claims": [
@@ -120,7 +168,7 @@ class DocCore:
         # self.sc.screenshot(self.md_b, o_dir=o, file_name="test_md")
         # self.sc.screenshot(self.q_b, o_dir=o, file_name="test_q")
         
-        print("INFO: Commened doc analysis")
+        print("INFO: Commenced doc analysis")
         self.PC.scroll(clicks=2, c=self.md_b.mid)
         time.sleep(0.2)
         # Take screenshots of the 3 document frames

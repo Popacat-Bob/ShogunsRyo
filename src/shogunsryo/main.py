@@ -1,5 +1,5 @@
 import time
-import easyocr
+from paddleocr import PaddleOCR
 from google import genai
 from pynput.keyboard import KeyCode, Listener as KListener
 
@@ -12,7 +12,16 @@ from shogunsryo.utils.TextExtractor import TextExtractor
 
 def main():
     te = TextExtractor(
-            easyocr.Reader(["en"], gpu=False) # should be true but having storage issues rn
+            PaddleOCR(
+                lang="en",
+                enable_mkldnn=False,
+                text_det_box_thresh=0.4,
+                text_det_thresh=0.2,
+                text_det_unclip_ratio=2.0,
+                use_doc_orientation_classify=False,
+                use_doc_unwarping=False,
+                use_textline_orientation=False,
+                )
             )
     control = Controller(
         dc=DocCore(te=te),

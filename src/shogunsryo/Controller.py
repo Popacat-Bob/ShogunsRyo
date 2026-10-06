@@ -31,6 +31,11 @@ IMPORTANT:
 - For color/seal claims, compare the RGB arrays exactly.
 - Do not assume a claim is true merely because it sounds plausible.
 - Check every claim independently.
+- For seal claims, `Letter.Seal Color` identifies the seal shown on the letter.
+- Each domain's `Color` field identifies that domain's seal color.
+- To determine whether a seal belongs to a domain, compare the two RGB arrays exactly.
+- RGB colors between seals of the same color may not match, allow a tolerance of 5 for each RGB value 
+- Example: if `Letter.Seal Color` is [255, 120, 177] and `Market.Color` is [255, 255, 172], then "This seal belongs to The Market" is FALSE.
 
 Once you have determined the answers, send ONLY a JSON object with the keys claim1, claim2, and claim3:
 
@@ -185,10 +190,16 @@ class Controller:
         res_str = self.dc.extractField(
             self.dc.SC.toArray(res_img)
         ).strip().upper()
+        
+        success_strings = {"EARNED", "EARED"}
+        decomp = set(res_str.split())
 
         print(res_str)
 
-        return "EARNED" in set(res_str.split())
+        for s in success_strings:
+            if s in decomp: return True
+
+        return False
 
     def answer(
         self,
@@ -328,13 +339,13 @@ class Controller:
 
             time.sleep(0.2)
 
-            
-            self.log(
-                docData,
-                claim_values,
-                verdict,
-                "Entry"
-                )
+            if not self.isSuccess():
+                self.log(
+                    docData,
+                    claim_values,
+                    verdict,
+                    "Error"
+                    )
 
         except Exception as e:
             print(
