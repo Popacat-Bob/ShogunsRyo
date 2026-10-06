@@ -64,7 +64,7 @@ REFER_INTENTS = {
     "wants a death sentence lifted",
     "wants to visit the shogun",
     "wants to speak to the shogun",
-    "wants to change the tax rate",
+    "wants the tax rate changed",
     "wants a prisoner set free",
     "wants a domain boundary restored",
     "wants leave to carry a sword",
@@ -102,7 +102,7 @@ class Controller:
             exist_ok=True
         )
 
-        log_file = self.log_dir / "errors.jsonl"
+        log_file = self.log_dir / "logs.jsonl"
 
         if log_file.exists():
             log_file.unlink()
@@ -124,18 +124,18 @@ class Controller:
             temperature=0,
         )
 
-    def log_error(
+    def log(
         self,
         docFrame,
         claims,
         verdict,
-        error
+        ltype, 
     ):
-        log_file = self.log_dir / "errors.jsonl"
+        log_file = self.log_dir / "logs.jsonl"
 
         entry = {
             "timestamp": datetime.now().isoformat(),
-            "error": str(error),
+            "log_type": str(ltype),
             "claims": claims,
             "verdict": verdict.value,
             "docFrame": docFrame,
@@ -168,8 +168,11 @@ class Controller:
         )
 
         # Handle common OCR truncation.
-        if intent == "wants a domain boundary resto":
-            intent = "wants a domain boundary restored"
+        match intent: 
+            case "wants a domain boundary resto":
+                intent = "wants a domain boundary restored"
+            case "wants a priest appointedto the temple":
+                intent = "wants a priest appointed to the temple"
 
         if intent in REFER_INTENTS:
             return Verdict.REFER
@@ -325,12 +328,12 @@ class Controller:
 
             time.sleep(0.2)
 
-            if not self.isSuccess():
-                self.log_error(
-                    docData,
-                    claim_values,
-                    verdict,
-                    "Wrong Answer"
+            
+            self.log(
+                docData,
+                claim_values,
+                verdict,
+                "Entry"
                 )
 
         except Exception as e:

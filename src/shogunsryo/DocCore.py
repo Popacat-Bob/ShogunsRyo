@@ -62,7 +62,7 @@ class DocCore:
             },
             "Letter": {
                 "From": self.extractField(nar, (11, 38, 12, 235)),
-                "Intent": self.extractField(nar, (52, 69, 12, 265)),
+                "Intent": self.extractField(nar, (52, 69, 12, 285)),
                 "Seal Color": nar[309, 49][::-1][:3].tolist(),
                 "Body": self.extractField(nar, (85, 144, 12, 525)),
             },
