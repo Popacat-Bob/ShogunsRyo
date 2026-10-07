@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 import json
+import copy
 
 from openai import OpenAI
 from google.genai import Client as GenAIClient
@@ -16,6 +17,33 @@ class STATUS(Enum):
     EXHAUSTED = 1
     TEMPORARILY_DOWN = 2
 
+
+
+
+def _strictify(schema: dict) -> dict:
+    """Make a JSON schema valid for strict structured outputs:
+    every object gets additionalProperties=false and all properties required."""
+    schema = copy.deepcopy(schema)
+
+    def walk(node):
+        if not isinstance(node, dict):
+            return
+        if node.get("type") == "object" or "properties" in node:
+            props = node.setdefault("properties", {})
+            node["additionalProperties"] = False
+            node["required"] = list(props.keys())
+            for sub in props.values():
+                walk(sub)
+        walk(node.get("items"))
+        for key in ("anyOf", "allOf", "oneOf", "prefixItems"):
+            for sub in node.get(key, []):
+                walk(sub)
+        for key in ("$defs", "definitions"):
+            for sub in node.get(key, {}).values():
+                walk(sub)
+
+    walk(schema)
+    return schema
 
 class AllModelsFailedError(RuntimeError):
     def __init__(self, errors: list[tuple[str, BaseException]]):
@@ -158,10 +186,11 @@ class OpenAIModel(DecisionModel[OpenAI]):
 
 
 class GroqModel(DecisionModel[GroqClient]):
-    def __init__(self, client: GroqClient, model: str):
+    def __init__(self, client: GroqClient, model: str, strict: bool = True):
         super().__init__(client, model)
         self._system_prompt: str | None = None
         self._response_format: dict | None = None
+        self._strict = strict
 
     def setSystemRules(self, prompt: str, schema: dict) -> None:
         self._system_prompt = prompt
@@ -169,8 +198,8 @@ class GroqModel(DecisionModel[GroqClient]):
             "type": "json_schema",
             "json_schema": {
                 "name": "response",
-                "schema": schema,
-                "strict": True,
+                "schema": _strictify(schema) if self._strict else schema,
+                "strict": self._strict,
             },
         }
 

@@ -86,7 +86,7 @@ def main():
             )
 
     genai, groq = \
-        GenAIModel(client=GenAIClient(), model="genai-3.5-flash.lite"),\
+        GenAIModel(client=GenAIClient(), model="gemini-3.5-flash-lite"),\
         GroqModel(client=GroqClient(), model="openai/gpt-oss-20b")
 
     genai.setSystemRules(prompt=DEFAULT_INITIAL_PROMPT, schema=SCHEMA)
