@@ -1,10 +1,10 @@
 import cv2
-from paddleocr import PaddleOCR
+from paddleocr import PaddleOCRVL
 from numpy import ndarray
 
 
 class TextExtractor:
-    def __init__(self, model: PaddleOCR):
+    def __init__(self, model: PaddleOCRVL):
         self.model = model
 
     def extractFromImg(

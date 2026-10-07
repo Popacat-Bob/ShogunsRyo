@@ -1,5 +1,5 @@
 import time
-from paddleocr import PaddleOCR
+from paddleocr import PaddleOCRVL
 from google import genai
 from pynput.keyboard import KeyCode, Listener as KListener
 
@@ -73,7 +73,7 @@ REFER_INTENTS = {
 
 def main():
     te = TextExtractor(
-            PaddleOCR(
+            PaddleOCRVL(
                 lang="en",
                 enable_mkldnn=False,
                 text_det_box_thresh=0.4,
@@ -82,6 +82,9 @@ def main():
                 use_doc_orientation_classify=False,
                 use_doc_unwarping=False,
                 use_textline_orientation=False,
+                vl_rec_backend="vllm-server", 
+                vl_rec_server_url="http://localhost:8000/v1",
+                vl_rec_api_model_name="PaddlePaddle/PaddleOCR-VL-1.6",
                 )
             )
 
