@@ -3,7 +3,7 @@ resolution = [1920, 1080]
 aspect_ratio = [16, 9]
 
 [Frames]
-verify_frame = [392, 229, 500, 259]
+verify_frame = [392, 229, 525, 259]
 narrative = [380, 312, 918, 656]
 misc_details = [975, 361, 1537, 707]
 questions = [389, 721, 747, 822]

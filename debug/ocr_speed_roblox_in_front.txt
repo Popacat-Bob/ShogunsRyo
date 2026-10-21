@@ -1,0 +1,48 @@
+Boost: CPU priority high: ok, power throttling off: ok, GPU priority high: ok
+Roblox running: True | window in front: 'Open File - Security Warning' | GPU utilisation / memory before: 97 %, 2652 MiB
+
+Part 1: one OCR read (gpu:0): median 58 ms, slowest 60 ms, fastest 51 ms
+        GPU utilisation / memory during: 100 %, 3294 MiB | window in front: 'Administrator:  OCR speed test'
+        => 27 reads per letter would take about 1.6 s
+
+Part 2: the letter needs 27 reads
+  the author's way (one read each):  1.6 s
+  batched way, run 1:              0.5 s   (OCR fast: 24 read in one batch, 3 read the normal way)
+  batched way, run 2:              0.5 s   (OCR fast: 24 read in one batch, 3 read the normal way)
+  fields that read DIFFERENTLY: 5 of 27
+      Intent: 'Wants samurai punished a' (author's way)  vs  'Wants a samurai punished' (batched)
+      Market.Head: 'Yasu' (author's way)  vs  'YasuX' (batched)
+      Market.Houses: '' (author's way)  vs  '96' (batched)
+      River Hamlet.Ryo: '62' (author's way)  vs  '062' (batched)
+      Claim 3: 'The Market has written in once t this season.' (author's way)  vs  'The Market has written in once this season.' (batched)
+
+All fields, the author's way:
+  Signed On                'y1'
+  Times Written            '1'
+  Today                    '0'
+  From                     'From The Market'
+  Intent                   'Wants samurai punished a'
+  Body                     'Soldiers took grain from our store 6 times this season and wrote nothing down. We are short 5 sacks before winter comes.'
+  Shisato.Ryo              '118'
+  Shisato.Head             'Denji'
+  Shisato.Houses           '38'
+  Kotobo.Ryo               '92'
+  Kotobo.Head              'Machi'
+  Kotobo.Houses            '42'
+  Farmers.Ryo              '151'
+  Farmers.Head             'Sadao'
+  Farmers.Houses           '61'
+  Market.Ryo               '236'
+  Market.Head              'Yasu'
+  Market.Houses            ''
+  Western Village.Ryo      '48'
+  Western Village.Head     'Kichi'
+  Western Village.Houses   '39'
+  River Hamlet.Ryo         '62'
+  River Hamlet.Head        'Tome'
+  River Hamlet.Houses      '23'
+  Claim 1                  'Soldiers took grain 6 times this season.'
+  Claim 2                  'The Market has 96 houses.'
+  Claim 3                  'The Market has written in once t this season.'
+
+Roblox running: True | GPU utilisation / memory after: 100 %, 3558 MiB
