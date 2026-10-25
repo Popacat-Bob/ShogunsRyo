@@ -90,7 +90,7 @@ class DocCore:
                     md0, (199, 219, 339, 416),
                     wl=INTEGER_WHITELIST
                 ),
-                "Color": self.extractField(nar, (169, 191, 289, 362)),
+                "Color": self.extractField(md0, (169, 191, 289, 362)),
             },
             "Kotobe": {
                 "Ryo": self.extractField(
@@ -102,7 +102,7 @@ class DocCore:
                     md1, (64, 83, 336, 413),
                     wl=INTEGER_WHITELIST
                 ),
-                "Color": self.extractField(nar, (32, 52, 286, 362)),
+                "Color": self.extractField(md1, (32, 52, 286, 362)),
             },
             "Farmers": {
                 "Ryo": self.extractField(
@@ -114,7 +114,7 @@ class DocCore:
                     md1, (125, 145, 338, 418),
                     wl=INTEGER_WHITELIST
                 ),
-                "Color": self.extractField(nar, (92, 113, 287, 358)),
+                "Color": self.extractField(md1, (92, 113, 287, 358)),
             },
             "Market": {
                 "Ryo": self.extractField(
@@ -126,7 +126,7 @@ class DocCore:
                     md2, (75, 97, 339, 411),
                     wl=INTEGER_WHITELIST
                 ),
-                "Color": self.extractField(nar, (45, 63, 279, 353)),
+                "Color": self.extractField(md2, (45, 63, 279, 353)),
             },
             "Western Village": {
                 "Ryo": self.extractField(
@@ -138,7 +138,7 @@ class DocCore:
                     md2, (138, 157, 339, 414),
                     wl=INTEGER_WHITELIST
                 ),
-                "Color": self.extractField(nar, (106, 127, 275, 362)),
+                "Color": self.extractField(md2, (106, 127, 275, 362)),
             },
             "River Hamlet": {
                 "Ryo": self.extractField(
@@ -150,7 +150,7 @@ class DocCore:
                     md2, (200, 219, 339, 412),
                     wl=INTEGER_WHITELIST
                 ),
-                "Color": self.extractField(nar, (169, 191, 275, 362)),
+                "Color": self.extractField(md2, (169, 191, 275, 362)),
             },
             "Claims": [
                 self.extractField(q, (11, 32, 11, 568)),

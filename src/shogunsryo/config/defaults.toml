@@ -7,7 +7,7 @@ verify_frame = [553, 356, 607, 370]
 narrative = [542, 390, 942, 591]
 misc_details = [967, 380, 1391, 604]
 questions = [522, 642, 1396, 761]
-result = [1268, 676, 1523, 698]
+result = [1180, 619, 1401, 637]
 
 [Points] # [x, y]
 start_button = [1358, 784]
