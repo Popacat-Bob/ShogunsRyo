@@ -2,14 +2,17 @@
 resolution = [1920, 1080]
 aspect_ratio = [16, 9]
 
-[Frames]
-verify_frame = [392, 229, 525, 259]
-narrative = [380, 312, 918, 656]
-misc_details = [975, 361, 1537, 707]
-questions = [389, 721, 747, 822]
+[Frames] # [x1, y1, x2, y2]
+verify_frame = [553, 356, 607, 370]
+narrative = [542, 390, 942, 591]
+misc_details = [967, 380, 1391, 604]
+questions = [522, 642, 1396, 761]
 result = [1268, 676, 1523, 698]
 
-[Points]
-start_button = [1408, 857]
+[Points] # [x, y]
+start_button = [1358, 784]
+grant = [669, 796]
+deny = [954, 798]
+refer = [1248, 793]
 
 

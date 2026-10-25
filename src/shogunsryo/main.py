@@ -28,9 +28,7 @@ IMPORTANT:
 - Check every claim independently.
 - For seal claims, `Letter.Seal Color` identifies the seal shown on the letter.
 - Each domain's `Color` field identifies that domain's seal color.
-- To determine whether a seal belongs to a domain, compare the two RGB arrays exactly.
-- RGB colors between seals of the same color may not match, allow a tolerance of 5 for each RGB value 
-- Example: if `Letter.Seal Color` is [255, 120, 177] and `Market.Color` is [255, 255, 172], then "This seal belongs to The Market" is FALSE.
+- To determine whether a seal belongs to a domain, compare if a text indicating color matches with each other
 
 Once you have determined the answers, send ONLY a JSON object with the keys claim1, claim2, and claim3:
 

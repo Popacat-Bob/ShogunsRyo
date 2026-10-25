@@ -140,11 +140,11 @@ class Controller:
 
         if b0:
             self.pc.move_to(
-                Coords(1470, 734)
+                Coords(1329, 664)
             )
         else:
             self.pc.move_to(
-                Coords(1375, 735)
+                Coords(1227, 664)
             )
         
         time.sleep(0.2)
@@ -153,11 +153,11 @@ class Controller:
 
         if b1:
             self.pc.move_to(
-                Coords(1469, 768)
+                Coords(1333, 703)
             )
         else:
             self.pc.move_to(
-                Coords(1348, 768)
+                Coords(1227, 703)
             )
 
         time.sleep(0.2)
@@ -166,11 +166,11 @@ class Controller:
 
         if b2:
             self.pc.move_to(
-                Coords(1470, 802)
+                Coords(1333, 741)
             )
         else:
             self.pc.move_to(
-                Coords(1372, 802)
+                Coords(1227, 741)
             )
 
         time.sleep(0.2)
@@ -180,17 +180,17 @@ class Controller:
         match v:
             case Verdict.ACCEPT:
                 self.pc.move_to(
-                    Coords(681, 850)
+                    Coords(681, 794)
                 )
 
             case Verdict.REJECT:
                 self.pc.move_to(
-                    Coords(982, 848)
+                    Coords(982, 794)
                 )
 
             case Verdict.REFER:
                 self.pc.move_to(
-                    Coords(1243, 853)
+                    Coords(1243, 794)
                 )
 
         self.pc.click()
@@ -219,7 +219,7 @@ class Controller:
             time.sleep(0.2)
 
             self.pc.move_to(
-                Coords(1408, 857)
+                Coords(1358, 794)
             )
 
             time.sleep(0.2)
