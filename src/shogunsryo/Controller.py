@@ -231,7 +231,6 @@ class Controller:
 
         try:
             docData = json.loads(docFrame)
-            print(docData)
 
             claims = json.loads(self.umo.request(docData))
 

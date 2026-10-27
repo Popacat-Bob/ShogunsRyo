@@ -20,6 +20,7 @@ IMPORTANT:
 - Claims may contain OCR errors. Correct obvious OCR errors using the surrounding JSON data.
 - Do not interpret OCR mistakes literally when the intended value is obvious.
 - Use context clues and common sense when interpreting possible OCR errors.
+- Times written determines how many time a letter has been written during the current season
 - Perform arithmetic explicitly when necessary.
 - For comparisons such as "X more than Y", calculate the difference from the relevant numeric fields.
 - A value of 0 means none/zero. For example, "Times Written": 0 means the person has NOT written this season.
@@ -29,6 +30,7 @@ IMPORTANT:
 - For seal claims, `Letter.Seal Color` identifies the seal shown on the letter.
 - Each domain's `Color` field identifies that domain's seal color.
 - To determine whether a seal belongs to a domain, compare if a text indicating color matches with each other
+- Color fields are parsed by an OCR, thus correct obvious OCR errors here too
 
 Once you have determined the answers, send ONLY a JSON object with the keys claim1, claim2, and claim3:
 
@@ -69,27 +71,38 @@ REFER_INTENTS = {
     "wants a priest appointed to the temple",
 }
 
+GROQ_MODEL_IDS = [
+    "openai/gpt-oss-20b",
+    "openai/gpt-oss-120b",
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+    "moonshotai/kimi-k2-instruct-0905",
+    "qwen/qwen3-32b",
+    "llama-3.3-70b-versatile",
+]
+
 def main():
     te = TextExtractor(
-            PaddleOCR(
-                lang="en",
-                enable_mkldnn=False,
-                text_det_box_thresh=0.4,
-                text_det_thresh=0.2,
-                text_det_unclip_ratio=2.0,
-                use_doc_orientation_classify=False,
-                use_doc_unwarping=False,
-                use_textline_orientation=False,
-                )
-            )
+        PaddleOCR(
+            lang="en",
+            enable_mkldnn=False,
+            text_det_box_thresh=0.4,
+            text_det_thresh=0.2,
+            text_det_unclip_ratio=2.0,
+            use_doc_orientation_classify=False,
+            use_doc_unwarping=False,
+            use_textline_orientation=False,
+        )
+    )
 
-    genai, groq = \
-        GenAIModel(client=GenAIClient(), model="gemini-3.5-flash-lite"),\
-        GroqModel(client=GroqClient(), model="openai/gpt-oss-20b")
+    groq_client = GroqClient()  # one shared client for all Groq models
+    groq_models = [GroqModel(client=groq_client, model=m) for m in GROQ_MODEL_IDS]
+    genai_model = GenAIModel(client=GenAIClient(), model="gemini-3.5-flash-lite")
 
-    genai.setSystemRules(prompt=DEFAULT_INITIAL_PROMPT, schema=SCHEMA)
-    groq.setSystemRules(prompt=DEFAULT_INITIAL_PROMPT, schema=SCHEMA)
-    umoz = UnifiedDecisionModel(models=[groq, genai])
+    all_models = [*groq_models, genai_model]
+    for model in all_models:
+        model.setSystemRules(prompt=DEFAULT_INITIAL_PROMPT, schema=SCHEMA)
+
+    umoz = UnifiedDecisionModel(models=all_models)
 
     control = Controller(
         dc=DocCore(te=te),
